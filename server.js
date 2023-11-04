@@ -12,7 +12,7 @@ const { MessagingResponse } = require('twilio').twiml;
 app.post('/sms', (req, res) => {
   const twiml = new MessagingResponse();
 
-  twiml.message('The Robots are coming! Head for the hills!');
+  twiml.message('Great! We will send you a few event options right away!');
 
   res.type('text/xml').send(twiml.toString());
 });
