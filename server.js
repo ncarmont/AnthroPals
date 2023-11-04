@@ -10,39 +10,29 @@ const client = require('twilio')(accountSid, authToken);
 const { MessagingResponse } = require('twilio').twiml;
 const Anthropic = require('@anthropic-ai/sdk');
 
-const headers = {
-    "x-portkey-api-key": process.env.ANTHROPIC_KEY,
-    "x-portkey-mode": "proxy anthropic",
-    "x-portkey-cache": "semantic"
-};
-
-
 const anthropic = new Anthropic({
-  apiKey: process.env.ANTHROPIC_KEY,
-  defaultHeaders: headers,
-  baseURL: 'https://api.portkey.ai/v1/proxy'
+	apiKey: process.env.ANTHROPIC_API_KEY,
 });
-
 
 async function main() {
   const completion = await anthropic.completions.create({
     model: 'claude-2',
     max_tokens_to_sample: 300,
-    prompt: `${Anthropic.HUMAN_PROMPT} why did the chicken cross the road? ${Anthropic.AI_PROMPT}`,
+    prompt: `What ?`,
   });
-  console.log(completion);    
-  return completion
+  console.log(completion.completion);
 }
+main().catch(console.error);
   
 
 
 app.post('/sms', async (req, res) => {
   const twiml = new MessagingResponse();
 
-  const mes = await main()
-  twiml.message(JSON.stringify(mes))
+  // const mes = await main()
+  // twiml.message(JSON.stringify(mes))
 
-  // twiml.message('Great! We will send you a few event options right away!');
+  twiml.message('Great! We will send you a few event options right away!');
 
   res.type('text/xml').send(twiml.toString());
 });
@@ -76,6 +66,14 @@ app.use(auth(config));
 app.get('/auth', (req, res) => {
   res.send(req.oidc.isAuthenticated() ? 'Logged in' : 'Logged out');
 });
+
+
+app.get('/test', async (req, res) => {
+  const mes = await main()
+  res.send(JSON.stringify(mes))
+});
+
+
 
 // app.get('/auth/google', 
 //   passport.authenticate('google', { scope: ['profile', 'email', 'calendar'] }));
