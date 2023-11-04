@@ -4,6 +4,9 @@ const express = require('express');
 const dotenv = require('dotenv');
 dotenv.config();
 const app = express();
+const accountSid = 'AC27655ac42ecf740b31e84da34a6c442d';
+const authToken = process.env.TWILIO_AUTH_TOKEN
+const client = require('twilio')(accountSid, authToken);
 
 // Passport config
 // passport.use(new GoogleStrategy({
@@ -45,6 +48,31 @@ app.get('/auth', (req, res) => {
 //     res.redirect('/');
 //   });
 
+app.get('/message', (req, res) => {
+  console.log("TEST")
+  console.log(req.query)
+  console.log(req.query.phone)
+// 'Hi there from AnthroPals! 👋 Please tell me more about which type of event you want me to sign you up for.',
+// 'Your appointment is coming up on July 21 at 3PM',
+  try {
+    client.messages
+    .create({
+        body: 'Hi there from AnthroPals! 👋 Please tell me more about which type of event you want me to sign you up for.',
+        to: '+44'+req.query.phone,
+        from: '+447862144615'
+    })
+    .then(message => console.log(message.sid)).done();
+
+    // from: 'whatsapp:+14155238886',
+    // to: 'whatsapp:+44'+req.query.phone
+  } catch (error) {
+    
+  }
+ 
+
+    res.send('Message sent');
+})
+
 // Serve homepage
 app.get('/', (req, res) => {
   res.send(`
@@ -61,6 +89,46 @@ app.get('/', (req, res) => {
     
     <!-- Custom CSS -->
     <style>
+
+    form {
+      max-width: 500px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    
+    label {
+      color: #dd4b39; 
+      font-size: 1.2em;
+      margin-bottom: 10px; 
+    }
+    
+    input[type="tel"] {
+      width: 100%;
+      padding: 12px 20px;
+      box-sizing: border-box;
+      border: grey 0.5px solid;
+      margin: 20px 0px;
+      border-radius: 4px;
+      font-size: 1em;
+    }
+    
+    input:focus {
+      outline: 2px solid #dd4b39;
+    }
+    
+    button {
+      padding: 12px 30px;
+      font-size: 1em; 
+      background-color: #dd4b39;
+      color: white;
+      border: grey 0.5px solid;
+      border-radius: 4px;
+      cursor: pointer; 
+    }
+    
+    button:hover {
+      background-color: #c13929;
+    }
 
     footer {
         margin-top: 50px;
@@ -114,6 +182,14 @@ app.get('/', (req, res) => {
         <p class="text-center">
           AnthroPals pre-fills your social calendar with relevant events for you during the week.
         </p>
+
+    <form >
+        <label for="phone">Phone Number:</label>
+        
+        <input type="tel" id="phone" name="phone" required pattern="[0-9]{10}">
+        
+        <button type="submit">Submit</button>
+    </form>
   
       <button id="btn-google" class="btn btn-block btn-google">
         <img src="google-logo.png"> Log in with Google
@@ -134,6 +210,16 @@ app.get('/', (req, res) => {
   googleBtn.addEventListener('click', () => {
   window.location = '/login'; 
   });
+
+  const form = document.querySelector('form');
+
+form.addEventListener('submit', (e) => {
+  e.preventDefault();
+  
+  const phone = form.phone.value;
+
+  window.location.href = "/message?phone="+phone;
+});
   </script>
   
   </html>
