@@ -49,11 +49,6 @@ app.get('/auth', (req, res) => {
 //   });
 
 app.get('/message', (req, res) => {
-  console.log("TEST")
-  console.log(req.query)
-  console.log(req.query.phone)
-// 'Hi there from AnthroPals! 👋 Please tell me more about which type of event you want me to sign you up for.',
-// 'Your appointment is coming up on July 21 at 3PM',
   try {
     client.messages
     .create({
