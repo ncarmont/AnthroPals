@@ -53,7 +53,7 @@ app.get('/message', (req, res) => {
     client.messages
     .create({
         body: 'Hi there from AnthroPals! 👋 Please tell me more about which type of event you want me to sign you up for.',
-        to: '+44'+req.query.phone,
+        to: '+44'+req.query.phone.replace(/^0/, ''),
         from: '+447862144615'
     })
     .then(message => console.log(message.sid)).done();
@@ -181,7 +181,7 @@ app.get('/', (req, res) => {
     <form >
         <label for="phone">Phone Number:</label>
         
-        <input type="tel" id="phone" name="phone" required pattern="[0-9]{10}">
+        <input type="tel" id="phone" name="phone" required>
         
         <button type="submit">Submit</button>
     </form>
@@ -213,7 +213,7 @@ form.addEventListener('submit', (e) => {
   
   const phone = form.phone.value;
 
-  window.location.href = "/message?phone="+phone;
+  window.location.href = "/message?phone="+phone.replace("+44","");
 });
   </script>
   
