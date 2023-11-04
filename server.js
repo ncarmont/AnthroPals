@@ -52,11 +52,36 @@ app.get('/message', (req, res) => {
   try {
     client.messages
     .create({
-        body: 'Hi there from AnthroPals! 👋 Please tell me more about which type of event you want me to sign you up for.',
+        body: 
+`Hi there from AnthroPals! 👋 I\'m here to keep your social calendar up and buzzing.
+
+What topics are you interested in? Give me one/two topics (e.g AI, energy, cooking, sports).`,
         to: '+44'+req.query.phone.replace(/^0/, ''),
         from: '+447862144615'
     })
     .then(message => console.log(message.sid)).done();
+
+
+        client.messages
+    .create({
+        body: '',
+        to: '+44'+req.query.phone.replace(/^0/, ''),
+        from: '+447862144615'
+    })
+    .then(message => console.log(message.sid)).done();
+
+
+    client.messages
+    .create({
+        body: `What is your goal at events:
+
+        1. Meeting new people
+        2. Learning something new`,
+        to: '+44'+req.query.phone.replace(/^0/, ''),
+        from: '+447862144615'
+    })
+    .then(message => console.log(message.sid)).done();
+
 
     // from: 'whatsapp:+14155238886',
     // to: 'whatsapp:+44'+req.query.phone
