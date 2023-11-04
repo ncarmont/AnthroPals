@@ -1,10 +1,16 @@
+import json
+import re
 import requests
 
 from requests.structures import CaseInsensitiveDict
 from anthropic import Anthropic, HUMAN_PROMPT, AI_PROMPT
+from serpapi import GoogleSearch
+
 
 ANTHROPIC_API_KEY \
     = "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"
+
+SERP_API_KEY = "5b50cbf170851bd1d18fd0878bc0739ba82ffd23e364f1a23703ccb27910394b"
 
 BRAVE_HEADER = CaseInsensitiveDict()
 BRAVE_HEADER["Accept"] = "application/json"
@@ -13,8 +19,23 @@ BRAVE_HEADER["X-Subscription-Token"] = "BSAt2nmuC57jmjrGEY9-JNAyAHTU6Z5"
 
 
 def _parse_brave_response(brave_response):
-    for result in brave_response['web']['results']:
-        print(result['url'])
+    return [result for result in brave_response['web']['results']]
+
+
+def _parse_serp_response(serp_response):
+    organic_results = serp_response['organic_results']
+    return {r['link'] for r in organic_results}
+
+
+def _parse_claude_response(claude_response):
+    # Regular expression to find JSON
+    json_pattern = r'{.*?}'
+    json_match = re.search(json_pattern, claude_response, re.DOTALL)
+
+    # Check if a match was found
+    if json_match:
+        matched_json = json_match.group()
+        return json.loads(matched_json)
 
 
 def find_events_by_prompt():
@@ -22,40 +43,62 @@ def find_events_by_prompt():
     pass
 
 
-def generate_web_searches_by_prompt():
-    """Given a prompt, generate google searches to find event website"""
+def generate_web_searches_by_prompt(search_topic, retry=0):
+    """Given an event descriptor (e.g science events), generate list google searches to find events"""
 
-    prompt = """
-    You are an assistant. 
-    Your job is to give me a list of 10 google queries for finding events in London. 
-    Vary your search queries to maximize the number of unique websites that will come up
-    Output your answer as a json format ("search queries")
-    
-    For example if you were searching dance events your JSON output might be  
-    {'search queries' : ["local dance events in London", "hip hop events in London this week", ...]}
-    
-    Give me a list of queries on google to find AI hackathon events in london. 
-    """
+    instruction_prompt = """
+        You are an assistant. 
+        Your job is to give me a list of 10 google queries for finding events in London. 
+        Vary your search queries to maximize the number of unique websites that will come up
+        Output your answer as a json format.
+        For example if you were searching dance events your JSON output might be  
+        {'search_queries' : ["local dance events in London", "hip hop events in London this week", ...]}
+        """
+    event_prompt = f"\n Give me a list of google queries to find {search_topic} events in london."
+    prompt = instruction_prompt + event_prompt
 
-    anthropic = Anthropic(api_key=ANTHROPIC_API_KEY)
-    completion = anthropic.completions.create(
-        model="claude-2",
-        max_tokens_to_sample=300,
-        prompt=f"{HUMAN_PROMPT} {prompt}{AI_PROMPT}",
-    )
-    print(completion.completion)
-    pass
+    if retry < 3:
+        try:
+            anthropic = Anthropic(api_key=ANTHROPIC_API_KEY)
+            completion = anthropic.completions.create(
+                model="claude-2",
+                max_tokens_to_sample=300,
+                prompt=f"{HUMAN_PROMPT}{prompt}{AI_PROMPT}",
+            )
+            completion = completion.completion
+            completion = _parse_claude_response(completion)
+            return completion['search_queries']
+
+        except Exception as e:
+            print(f"Retrying Claude (generate search results) (attempt: {retry})")
+            generate_web_searches_by_prompt(event_descriptor=event_descriptor, retry=retry+1)
+
+    raise ValueError("Claude cannot process search engine")
 
 
-def execute_web_search(search_query, provider="brave"):
+def execute_web_search(search_query, provider):
     """Execute a search using a provider and parse results"""
 
-    # params = {"q": "List of websites of dance in london"}
-    params = {"q": {search_query}}
-    headers = BRAVE_HEADER
+    if provider == "brave":
+        params = {"q": {search_query}}
+        headers = BRAVE_HEADER
+        response = requests.get(f"https://api.search.brave.com/res/v1/web/search", headers=headers, params=params)
+        return _parse_brave_response(response.json())
 
-    response = requests.get(f"https://api.search.brave.com/res/v1/web/search", headers=headers, params=params)
-    return response.json()
+    if provider == "serp":
+
+        params = {
+            "q": {search_query},
+            "location": "London, United Kingdom",
+            "hl": "en",
+            "gl": "us",
+            "google_domain": "google.com",
+            "api_key": SERP_API_KEY
+        }
+
+        search = GoogleSearch(params)
+        results = search.get_dict()
+        return _parse_serp_response(results)
 
 
 def locate_event_link_on_website():
@@ -83,14 +126,41 @@ def run_events_locator():
     pass
 
 
-
 def run_tool():
-    generate_web_searches_by_prompt()
 
+    # Specify search topic
+    search_topic = "dungeon and dragons"
+
+    # Generate search queries for topic
+    print(f"Generating search queries for {search_topic}")
+    search_queries = generate_web_searches_by_prompt(search_topic)
+    for sq in search_queries:
+        print(f"\t {sq}")
+
+    # Generate links for each search query
+    print(f"Generating links for each search query")
+    all_event_links = []
+    for search_query in search_queries:
+        print(f"Generating links for {search_query}")
+        search_query_links = execute_web_search(search_query=search_query, provider="serp")
+
+        for url in search_query_links:
+            print(f"\t {url}")
+            all_event_links.append(url)
+
+    all_event_links = list(set(all_event_links))
+    print(all_event_links)
+
+    """
     for search_query in ["ai hackathons london", "london ai hackathon 2023"]:
         print(f"running search query for {search_query}")
-        json = execute_web_search(search_query)
-        print(_parse_brave_response(json))
+        result = execute_web_search(search_query=search_query, provider="serp")
+        organic_results = result['organic_results']
+        for r in organic_results:
+            print(r['title'])
+            print(r['link'])
+    """
+
 
 if __name__ == "__main__":
     run_tool()
