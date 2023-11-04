@@ -7,6 +7,15 @@ const app = express();
 const accountSid = 'AC27655ac42ecf740b31e84da34a6c442d';
 const authToken = process.env.TWILIO_AUTH_TOKEN
 const client = require('twilio')(accountSid, authToken);
+const { MessagingResponse } = require('twilio').twiml;
+
+app.post('/sms', (req, res) => {
+  const twiml = new MessagingResponse();
+
+  twiml.message('The Robots are coming! Head for the hills!');
+
+  res.type('text/xml').send(twiml.toString());
+});
 
 // Passport config
 // passport.use(new GoogleStrategy({
