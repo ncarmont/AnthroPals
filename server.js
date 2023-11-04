@@ -8,11 +8,41 @@ const accountSid = 'AC27655ac42ecf740b31e84da34a6c442d';
 const authToken = process.env.TWILIO_AUTH_TOKEN
 const client = require('twilio')(accountSid, authToken);
 const { MessagingResponse } = require('twilio').twiml;
+const Anthropic = require('@anthropic-ai/sdk');
 
-app.post('/sms', (req, res) => {
+const headers = {
+    "x-portkey-api-key": process.env.ANTHROPIC_KEY,
+    "x-portkey-mode": "proxy anthropic",
+    "x-portkey-cache": "semantic"
+};
+
+
+const anthropic = new Anthropic({
+  apiKey: process.env.ANTHROPIC_KEY,
+  defaultHeaders: headers,
+  baseURL: 'https://api.portkey.ai/v1/proxy'
+});
+
+
+async function main() {
+  const completion = await anthropic.completions.create({
+    model: 'claude-2',
+    max_tokens_to_sample: 300,
+    prompt: `${Anthropic.HUMAN_PROMPT} why did the chicken cross the road? ${Anthropic.AI_PROMPT}`,
+  });
+  console.log(completion);    
+  return completion
+}
+  
+
+
+app.post('/sms', async (req, res) => {
   const twiml = new MessagingResponse();
 
-  twiml.message('Great! We will send you a few event options right away!');
+  const mes = await main()
+  twiml.message(JSON.stringify(mes))
+
+  // twiml.message('Great! We will send you a few event options right away!');
 
   res.type('text/xml').send(twiml.toString());
 });
@@ -71,25 +101,7 @@ What topics are you interested in? Give me one/two topics (e.g AI, energy, cooki
     .then(message => console.log(message.sid)).done();
 
 
-        client.messages
-    .create({
-        body: '',
-        to: '+44'+req.query.phone.replace(/^0/, ''),
-        from: '+447862144615'
-    })
-    .then(message => console.log(message.sid)).done();
 
-
-    client.messages
-    .create({
-        body: `What is your goal at events:
-
-        1. Meeting new people
-        2. Learning something new`,
-        to: '+44'+req.query.phone.replace(/^0/, ''),
-        from: '+447862144615'
-    })
-    .then(message => console.log(message.sid)).done();
 
 
     // from: 'whatsapp:+14155238886',
@@ -99,7 +111,62 @@ What topics are you interested in? Give me one/two topics (e.g AI, energy, cooki
   }
  
 
-    res.send('Message sent');
+    res.send(`<!DOCTYPE html>
+    <html>
+    <head>
+      <title>Registration Success</title>
+      
+      <style>
+        /* Modern theme styles */
+        
+        body {
+          background-color: #f2f2f2;
+          font-family: Arial, sans-serif;   
+        }
+        
+        .container {
+          max-width: 500px;  
+          margin: 0 auto;
+          background-color: #fff;
+          padding: 30px; 
+          border-radius: 5px;
+          text-align: center; 
+        }
+        
+        h1 {
+          color: #dd4b39;
+        }
+        
+        p {
+          font-size: 1.2em; 
+        }
+        
+      </style>
+      
+    </head>
+    
+    <body>
+    
+      <div class="container">
+    
+        <h1>Registration Successful!</h1>  
+    
+        <p>
+          Thank you for registering! You should receive a confirmation SMS shortly.
+        </p>
+    
+        <p>
+          Please verify your number to activate your account.
+        </p>
+    
+        <p>
+          Welcome aboard! Let us know if you have any other questions.
+        </p>
+    
+      </div>
+    
+    </body>
+    </html>`);
 })
 
 // Serve homepage
