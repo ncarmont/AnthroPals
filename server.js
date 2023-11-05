@@ -111,8 +111,19 @@ async function main(lastMessageBody) {
   I have the following user preference for events: ${lastMessageBody}.
   What 3 events should I go to (including date, time and the valid event link from the events I sent you) within the next week given today is ${new Date().toISOString()}?
   
-  If there are no relevant events in the designated timeframe, please respond with "No events".
-  Be as concise as possible and give your response only in the following bullet points format: (e.g "- AI Event from 2-3pm on 10/10/2023 (https://event.com/event")  
+  If there are no relevant events in the designated timeframe, please respond with "No events". 
+  Be as concise as possible and give your response only in the following bullet points format: (e.g "- AI Event from 2-3pm on 10/10/2023 (<url>)"). 
+
+  For example for this event:
+
+  <event url=https://aifringe.org/events/>{"title": "Expanding the conversation: AI for everyone", "event_description": "Day one at the AI Fringe Hub will set the scene for the week\u2019s conversations, exploring the benefits and risks of AI, its impact on underrepresented communities, research across the devolved nations, and more.", "demographics": "Anyone interested in AI", "keywords": ["AI", "ethics", "safety", "policy"], "time_start": "2023-10-30T00:00:00", "time_end": "2023-10-30T23:59:59", "location": "Knowledge Centre at The British Library", "cost_in_pounds": 0, "activity_types": ["learning", "discussion"], "interactive": true, "food_and_drink": false, "estimated_number_of_attendees": 100}</event>
+
+  We want the following response: 
+
+  - Expanding the conversation AI Event from 12am to 12pm on 2023-10-30 (https://aifringe.org/events/)
+
+  Only return the exact valid URL from the input given. 
+  
 `
 // 'claude-instant-1',
   const completion = await anthropic.completions.create({
@@ -674,6 +685,5 @@ const eventsImpr = {"events":[
   `<event url=https://www.meetup.com/comic-and-graphic-novel-readers-club/events/296227058/>{"title": "Miracleman - Alan Moore", "event_description": "Discussion of Alan Moore's deconstruction of superhero comics with Miracleman", "demographics": "Comic book fans", "keywords": ["Comic Books", "Sci-Fi/Fantasy"], "time_start": "2023-11-07T19:00:00", "time_end": "2023-11-07T21:00:00", "location": "Prince of Wales, London", "cost_in_pounds": 0, "activity_types": ["Learning", "Discussion"], "interactive": true, "food_and_drink": false, "estimated_number_of_attendees": null}</event>`,
   `<event url=https://aifringe.org#partners>{"title": "Expanding the conversation: AI for everyone", "event_description": "Day one at the AI Fringe Hub will set the scene for the week\u2019s conversations, exploring the benefits and risks of AI, its impact on underrepresented communities, research across the devolved nations, and more.", "demographics": "Anyone interested in AI", "keywords": ["AI", "ethics", "safety", "inclusion"], "time_start": "2023-10-30T00:00:00", "time_end": "2023-10-30T23:59:59", "location": "Knowledge Centre at The British Library", "cost_in_pounds": 0, "activity_types": ["learning", "discussion"], "interactive": true, "food_and_drink": false, "estimated_number_of_attendees": 100}</event>`,
   `<event url=https://www.meetup.com/tech-talks-diversity-inclusion-and-equity/events/292662463/>{"title": "Inclusive organisational design", "event_description": "A panel discussion to explore problems and solutions around inclusive organisational design and how technology can support it.", "demographics": "Anyone interested in diversity, inclusion and organisational design", "keywords": ["diversity", "inclusion", "organisational design", "technology"], "time_start": "2023-11-21T18:30:00+00:00", "time_end": "2023-11-21T20:30:00+00:00", "location": "Virtual", "cost_in_pounds": 0, "activity_types": ["learning", "discussion"], "interactive": true, "food_and_drink": false, "estimated_number_of_attendees": null}</event>`,
-  `<event url=https://aifringe.org/events#>{"title": "Expanding the conversation: AI for everyone", "event_description": "Day one at the AI Fringe Hub will set the scene for the week\u2019s conversations, exploring the benefits and risks of AI, its impact on underrepresented communities, research across the devolved nations, and more.", "demographics": "Anyone interested in AI", "keywords": ["AI", "ethics", "safety", "policy"], "time_start": "2023-10-30T00:00:00", "time_end": "2023-10-30T23:59:59", "location": "Knowledge Centre at The British Library", "cost_in_pounds": 0, "activity_types": ["learning", "discussion"], "interactive": true, "food_and_drink": false, "estimated_number_of_attendees": 100}</event>`,
-  ...events
+  `<event url=https://aifringe.org/events#>{"title": "Expanding the conversation: AI for everyone", "event_description": "Day one at the AI Fringe Hub will set the scene for the week\u2019s conversations, exploring the benefits and risks of AI, its impact on underrepresented communities, research across the devolved nations, and more.", "demographics": "Anyone interested in AI", "keywords": ["AI", "ethics", "safety", "policy"], "time_start": "2023-10-30T00:00:00", "time_end": "2023-10-30T23:59:59", "location": "Knowledge Centre at The British Library", "cost_in_pounds": 0, "activity_types": ["learning", "discussion"], "interactive": true, "food_and_drink": false, "estimated_number_of_attendees": 100}</event>`
   ]}
