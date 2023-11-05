@@ -3,6 +3,7 @@ const express = require('express');
 // const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const dotenv = require('dotenv');
 dotenv.config();
+const bodyParser = require('body-parser');
 const app = express();
 const accountSid = 'AC27655ac42ecf740b31e84da34a6c442d';
 const authToken = process.env.TWILIO_AUTH_TOKEN
@@ -10,15 +11,19 @@ const client = require('twilio')(accountSid, authToken);
 const { MessagingResponse } = require('twilio').twiml;
 const Anthropic = require('@anthropic-ai/sdk');
 
+app.use(bodyParser.urlencoded({ extended: false }));
+
+
 const anthropic = new Anthropic({
 	apiKey: process.env.ANTHROPIC_API_KEY,
 });
 
-async function main() {
+async function main(lastMessageBody) {
   const userQuestion = `
   Be as concise as possible and give your response in bullet points (e.g "- AI Event from 2-3pm on 10/10/2023")
   Given these events ${JSON.stringify(events)} 
   
+  I have the following user preference for events: ${lastMessageBody}.
   What 3 events should I go to (including date and time) within the next week given today is ${new Date().toISOString()}?`
   const completion = await anthropic.completions.create({
     model: 'claude-2',
@@ -32,9 +37,14 @@ async function main() {
 
 app.post('/sms', async (req, res) => {
   const twiml = new MessagingResponse();
-  console.log(req)
+  console.log(req.body);
+  
+  // Get the last message sent to your Twilio number
+  const lastMessageBody = req.body.Body; // The text body of the last incoming message
+  console.log(`Last incoming message: ${lastMessageBody}`);
 
-  const mes = await main()
+  // Your main function which presumably does some processing and returns a message
+  const mes = await main(lastMessageBody);
   twiml.message(JSON.stringify(mes))
 
   res.type('text/xml').send(twiml.toString());
@@ -72,7 +82,7 @@ app.get('/auth', (req, res) => {
 
 
 app.get('/test', async (req, res) => {
-  const mes = await main()
+  const mes = await main("AI Events")
   res.send(JSON.stringify(mes))
 });
 
