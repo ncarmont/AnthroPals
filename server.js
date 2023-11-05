@@ -12,7 +12,6 @@ const { MessagingResponse } = require('twilio').twiml;
 const Anthropic = require('@anthropic-ai/sdk');
 
 app.use(bodyParser.urlencoded({ extended: false }));
-const passport = require('passport');
 
 const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
 const GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET;
@@ -139,7 +138,6 @@ async function main(lastMessageBody) {
 
 app.post('/sms', async (req, res) => {
 
-
   try {
     const twiml = new MessagingResponse();
     const lastMessageBody = req.body.Body; // The text body of the last incoming message
@@ -156,7 +154,6 @@ app.post('/sms', async (req, res) => {
   } catch (error) {
     return res.send("error").status(500)
   }
- 
 });
 
 // const { auth } = require('express-openid-connect');
@@ -196,10 +193,8 @@ What topics are you interested in? Give me one/two topics (e.g AI, Spanish, etc)
     .then(message => console.log(message.sid)).done();
 
   } catch (error) {
-    
+    return new Error(error).status(500)
   }
- 
-
     res.send(`<!DOCTYPE html>
     <html>
     <head>
