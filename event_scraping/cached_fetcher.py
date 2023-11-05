@@ -1,6 +1,10 @@
 import os
 import pickle
+import datetime as dt
+
 from anthropic_interface import AnthropicInterface, MaybeEventSummary
+
+from event_template import EventSummary
 
 CACHE_FILE = "cached_events.pkl"
 URLS_FILE = "cached_urls.pkl"
@@ -42,6 +46,22 @@ def fetch_event_summary(url: str) -> MaybeEventSummary:
         cached_events[url] = event_summary
         save_cached_events(cached_events)
         return event_summary
+    
+def get_all_future_events(current_datetime: dt.datetime) -> list[tuple[str, EventSummary]]:
+    # (Warning, this will only return events that have been cached)
+    cached_events = load_cached_events()
+    future_events = []
+    for url, maybe_event_summary in cached_events.items():
+        if maybe_event_summary.event_summary is not None:
+            event_summary = maybe_event_summary.event_summary
+            # TODO: Handle timezones in a better way
+            # (Ideally localize `current_datetime` and add localization to EventSummary validator)
+            time_start = maybe_event_summary.event_summary.time_start
+            if time_start.tzinfo is not None:
+                time_start = time_start.replace(tzinfo=None)
+            if time_start > current_datetime:
+                future_events.append((url, event_summary))
+    return future_events
 
 if __name__ == "__main__":
     cached_urls = load_cached_urls()
