@@ -43,9 +43,9 @@ passport.use(new GoogleStrategy({
 ));
 
 // Configure Express
-app.use(session({ secret: 'secret', resave: true, saveUninitialized: true }));
-app.use(passport.initialize());
-app.use(passport.session());
+// app.use(session({ secret: 'secret', resave: true, saveUninitialized: true }));
+// app.use(passport.initialize());
+// app.use(passport.session());
 
 // GET /auth/google
 // Use passport.authenticate() as route middleware to authenticate the request
@@ -148,19 +148,7 @@ app.post('/sms', async (req, res) => {
   let mes = `Good news 😎 I found some relevant events for you this week: 
   
   `+ resp 
-  
-  // +
-  // `
-  
-  // 👉 Please respond Y/N for attending the following events and why or why not:
-  //     1. e.g. Y, because I love hackathons
-  //     2. e.g. N, because I hate lectures
-  //     3. 
-  //     `;
-if (!resp.includes("http")){
-  mes = "Sorry I couldn't find any relevant events for you this week! Try another event type."
-}
-  
+
   twiml.message(mes.replace(/\\n/g, '\n'))
   return res.type('text/xml').send(twiml.toString());
 });
