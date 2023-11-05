@@ -3,6 +3,7 @@ import time
 from bs4 import BeautifulSoup
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
+import requests
 
 # Environment variables to run selenium (website scraper)
 chrome_options = Options()
@@ -31,3 +32,16 @@ def scrape_website_text_from_url(url):
     driver.quit()
 
     return website_text
+
+
+def get_all_links(url):
+    response = requests.get(url)
+    soup = BeautifulSoup(response.text, 'html.parser')
+
+    for link in soup.find_all('a'):
+        print(link.get('href'))
+
+
+if __name__ == "__main__":
+    print(get_all_links("https://aifringe.org/events"))
+
