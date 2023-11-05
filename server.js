@@ -135,18 +135,24 @@ app.post('/sms', async (req, res) => {
   // Your main function which presumably does some processing and returns a message
   const mes = `Good news 😎 I found 3 relevant events for you this week: 
   
-  `+ await main(lastMessageBody) +`
+  `+ await main(lastMessageBody);
+
   
-👉 Please respond Y/N for attending the following events and why or why not:
-  1. e.g. Y, because I love hackathons
-  2. e.g. N, because I hate lectures
-  3. e.g. N, because I'm busy on Thursdays 
-  `;
   
   twiml.message(mes.replace(/\\n/g, '\n'))
 
+  await setTimeout(() => {
+    twiml.message(`
+    👉 Please respond Y/N for attending the following events and why or why not:
+      1. e.g. Y, because I love hackathons
+      2. e.g. N, because I hate lectures
+      3. e.g. N, because I'm busy on Thursdays 
+      `)
+  }, 100);
+
   res.type('text/xml').send(twiml.toString());
 });
+
 
 const { auth } = require('express-openid-connect');
 
