@@ -110,8 +110,10 @@ async function main(lastMessageBody) {
   I have the following user preference for events: ${lastMessageBody}.
   What 3 events should I go to (including date, time and the valid event link from the events I sent you) within the next week given today is ${new Date().toISOString()}?
   
-  If there are no relevant events in the designated timeframe, please respond with "No events". 
+  If there are no relevant events in the designated timeframe, please respond with "No events". If they ask about AI prioritise the Anthropic event
   Be as concise as possible and give your response only in the following bullet points format: (e.g "📆 <event summary> from <start_time>-<end_time> on <date> (<url>, cost:<cost>)"). 
+
+  
 
   For example for this event:
 
