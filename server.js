@@ -144,17 +144,17 @@ app.post('/sms', async (req, res) => {
 
   const lastMessageBody = req.body.Body; // The text body of the last incoming message
 
-  if (lastMessageBody.includes("1.")){
-      await fs.writeFile('./localdb.json', {lastMessageBody}, (err) => {
-        if (err) throw err;
-        console.log('Data written to file');
-    });
+  // if (lastMessageBody.includes("1.")){
+  //     await fs.writeFile('./localdb.json', {lastMessageBody}, (err) => {
+  //       if (err) throw err;
+  // //       console.log('Data written to file');
+  // //   });
 
-    const out = JSON.stringify(JSON.parse(fs.readFileSync("./localdb.json").toString()))
+  //   const out = JSON.stringify(JSON.parse(fs.readFileSync("./localdb.json").toString()))
 
-    res.type('text/xml').send(out.toString());
+    // res.type('text/xml').send(out.toString());
 
-  }
+  // }
 
   console.log(`Last incoming message: ${lastMessageBody}`);
 
@@ -163,14 +163,16 @@ app.post('/sms', async (req, res) => {
   // Your main function which presumably does some processing and returns a message
   let mes = `Good news 😎 I found some relevant events for you this week: 
   
-  `+ resp +
-  `
+  `+ resp 
   
-  👉 Please respond Y/N for attending the following events and why or why not:
-      1. e.g. Y, because I love hackathons
-      2. e.g. N, because I hate lectures
-      3. 
-      `;
+  // +
+  // `
+  
+  // 👉 Please respond Y/N for attending the following events and why or why not:
+  //     1. e.g. Y, because I love hackathons
+  //     2. e.g. N, because I hate lectures
+  //     3. 
+  //     `;
 if (!resp.includes("http")){
   mes = "Sorry I couldn't find any relevant events for you this week! Try another event type."
 }
