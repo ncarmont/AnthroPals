@@ -13,34 +13,29 @@ const Anthropic = require('@anthropic-ai/sdk');
 
 app.use(bodyParser.urlencoded({ extended: false }));
 const passport = require('passport');
-const GoogleStrategy = require('passport-google-oauth20').Strategy;
-const session = require('express-session');
-const { google } = require('googleapis');
-
-
 
 const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
 const GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET;
 
 // Passport session setup
-passport.serializeUser((user, done) => {
-  done(null, user);
-});
+// passport.serializeUser((user, done) => {
+//   done(null, user);
+// });
 
-passport.deserializeUser((obj, done) => {
-  done(null, obj);
-});
+// passport.deserializeUser((obj, done) => {
+//   done(null, obj);
+// });
 
 // Use the GoogleStrategy within Passport
-passport.use(new GoogleStrategy({
-    clientID: GOOGLE_CLIENT_ID,
-    clientSecret: GOOGLE_CLIENT_SECRET,
-    callbackURL: "https://www.anthropals.social/auth/google/callback"
-  },
-  (accessToken, refreshToken, profile, done) => {
-    return done(null, profile);
-  }
-));
+// passport.use(new GoogleStrategy({
+//     clientID: GOOGLE_CLIENT_ID,
+//     clientSecret: GOOGLE_CLIENT_SECRET,
+//     callbackURL: "https://www.anthropals.social/auth/google/callback"
+//   },
+//   (accessToken, refreshToken, profile, done) => {
+//     return done(null, profile);
+//   }
+// ));
 
 // Configure Express
 // app.use(session({ secret: 'secret', resave: true, saveUninitialized: true }));
@@ -48,56 +43,56 @@ passport.use(new GoogleStrategy({
 // app.use(passport.session());
 
 // GET /auth/google
-// Use passport.authenticate() as route middleware to authenticate the request
-app.get('/auth/google',
-  passport.authenticate('google', { scope: ['https://www.googleapis.com/auth/calendar', 'profile', 'email'] })
-);
+// // Use passport.authenticate() as route middleware to authenticate the request
+// app.get('/auth/google',
+//   passport.authenticate('google', { scope: ['https://www.googleapis.com/auth/calendar', 'profile', 'email'] })
+// );
 
 // GET /auth/google/callback
-// Use passport.authenticate() as route middleware to authenticate the request
-app.get('/auth/google/callback', 
-  passport.authenticate('google', { failureRedirect: '/' }),
-  (req, res) => {
-    // Successful authentication, redirect home
-    res.redirect('/');
-  }
-);
+// // Use passport.authenticate() as route middleware to authenticate the request
+// app.get('/auth/google/callback', 
+//   passport.authenticate('google', { failureRedirect: '/' }),
+//   (req, res) => {
+//     // Successful authentication, redirect home
+//     res.redirect('/');
+//   }
+// );
 
 // Access the Google Calendar API
-app.get('/calendar', (req, res) => {
-  if (!req.user) {
-    res.status(401).send('You need to sign in with Google');
-    return;
-  }
+// app.get('/calendar', (req, res) => {
+//   if (!req.user) {
+//     res.status(401).send('You need to sign in with Google');
+//     return;
+//   }
 
-  const oauth2Client = new google.auth.OAuth2(
-    GOOGLE_CLIENT_ID,
-    GOOGLE_CLIENT_SECRET,
-    'https://www.anthropals.social/auth/google/callback'
-  );
+//   const oauth2Client = new google.auth.OAuth2(
+//     GOOGLE_CLIENT_ID,
+//     GOOGLE_CLIENT_SECRET,
+//     'https://www.anthropals.social/auth/google/callback'
+//   );
 
-  oauth2Client.setCredentials({
-    access_token: req.user.accessToken
-  });
+//   oauth2Client.setCredentials({
+//     access_token: req.user.accessToken
+//   });
 
-  const calendar = google.calendar({version: 'v3', auth: oauth2Client});
+//   const calendar = google.calendar({version: 'v3', auth: oauth2Client});
   
-  calendar.events.list({
-    calendarId: 'primary',
-    timeMin: (new Date()).toISOString(),
-    maxResults: 10,
-    singleEvents: true,
-    orderBy: 'startTime',
-  }, (err, result) => {
-    if (err) {
-      res.status(500).send('Error retrieving calendar events');
-      console.error('The API returned an error: ' + err);
-      return;
-    }
-    const events = result.data.items;
-    res.status(200).json(events);
-  });
-});
+//   calendar.events.list({
+//     calendarId: 'primary',
+//     timeMin: (new Date()).toISOString(),
+//     maxResults: 10,
+//     singleEvents: true,
+//     orderBy: 'startTime',
+//   }, (err, result) => {
+//     if (err) {
+//       res.status(500).send('Error retrieving calendar events');
+//       console.error('The API returned an error: ' + err);
+//       return;
+//     }
+//     const events = result.data.items;
+//     res.status(200).json(events);
+//   });
+// });
 
 const anthropic = new Anthropic({
 	apiKey: process.env.ANTHROPIC_API_KEY,
