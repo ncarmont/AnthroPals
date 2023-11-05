@@ -122,7 +122,7 @@ async function main(lastMessageBody) {
 
   - Expanding the conversation AI Event from 12am to 12pm on 2023-10-30 (https://aifringe.org/events/)
 
-  Only return the exact valid URL from the input given. 
+  Only return the exact valid URL from the input given. Don't give anything else but the event bullet points.
   
 `
 // 'claude-instant-1',
