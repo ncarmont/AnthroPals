@@ -317,7 +317,7 @@ app.get('/', (req, res) => {
     </form>
   
       <button id="btn-google" class="btn btn-block btn-google">
-        <img src="google-logo.png"> Log in with Google
+        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/53/Google_%22G%22_Logo.svg/768px-Google_%22G%22_Logo.svg.png"> Log in with Google
       </button>
   
     </div>
