@@ -1,4 +1,5 @@
 import json
+import pandas as pd
 import re
 import requests
 
@@ -19,7 +20,8 @@ BRAVE_HEADER["X-Subscription-Token"] = "BSAt2nmuC57jmjrGEY9-JNAyAHTU6Z5"
 
 
 def _parse_brave_response(brave_response):
-    return [result for result in brave_response['web']['results']]
+    return [{'title': result['title'], 'url': result['url']}
+            for result in brave_response['web']['results']]
 
 
 def _parse_serp_response(serp_response):
@@ -71,7 +73,7 @@ def generate_web_searches_by_prompt(search_topic, retry=0):
 
         except Exception as e:
             print(f"Retrying Claude (generate search results) (attempt: {retry})")
-            generate_web_searches_by_prompt(event_descriptor=event_descriptor, retry=retry+1)
+            generate_web_searches_by_prompt(search_topic=search_topic, retry=retry+1)
 
     raise ValueError("Claude cannot process search engine")
 
@@ -126,40 +128,61 @@ def run_events_locator():
     pass
 
 
-def run_tool():
-
-    # Specify search topic
-    search_topic = "dungeon and dragons"
-
-    # Generate search queries for topic
+def run_single_topic_flow(search_topic):
     print(f"Generating search queries for {search_topic}")
     search_queries = generate_web_searches_by_prompt(search_topic)
+
     for sq in search_queries:
         print(f"\t {sq}")
 
     # Generate links for each search query
     print(f"Generating links for each search query")
-    all_event_links = []
+
+    events_by_topic = []
     for search_query in search_queries:
-        print(f"Generating links for {search_query}")
-        search_query_links = execute_web_search(search_query=search_query, provider="serp")
+        try:
+            search_query_links = execute_web_search(search_query=search_query, provider="brave")
 
-        for url in search_query_links:
-            print(f"\t {url}")
-            all_event_links.append(url)
+            for brave_response in search_query_links:
+                event_record = {'topic': search_topic,
+                                'search_title': brave_response['title'],
+                                'event_url': brave_response['url']}
 
-    all_event_links = list(set(all_event_links))
-    print(all_event_links)
+                events_by_topic.append(event_record)
 
-    """
-    for search_query in ["ai hackathons london", "london ai hackathon 2023"]:
-        print(f"running search query for {search_query}")
-        result = execute_web_search(search_query=search_query, provider="serp")
-        organic_results = result['organic_results']
-        for r in organic_results:
-            print(r['title'])
-            print(r['link'])
-    """
+        except Exception as e:
+            print("Encountered exception ... continuing")
+            continue
+
+    # store results
+    df_events = pd.DataFrame(events_by_topic)
+    events_csv_path = f"~/Desktop/{search_topic}_events.csv"
+    df_events.to_csv(events_csv_path)
+    print(f"Stored {search_topic} links to {events_csv_path}")
+
+    return events_by_topic
+
+
+def run_tool():
+
+    # Specify search topic
+    search_topics = ["dungeon and dragons", "auto show", "ai hackathon", "science lecture"]
+
+    # Generate search queries for topic
+    all_events = []
+
+    for search_topic in search_topics:
+        events_for_topic = run_single_topic_flow(search_topic)
+        all_events.extend(events_for_topic)
+
+    # Store all events
+    df_events = pd.DataFrame(all_events)
+    events_csv_path = f"~/Desktop/all_events.csv"
+    df_events.to_csv(events_csv_path)
+    print(f"Stored all event links to {events_csv_path}")
+
+
+
 
 
 if __name__ == "__main__":
