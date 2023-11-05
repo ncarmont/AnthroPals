@@ -137,33 +137,31 @@ async function main(lastMessageBody) {
   
 
 app.post('/sms', async (req, res) => {
+
   const twiml = new MessagingResponse();
   console.log(req.body);
   
   const lastMessageBody = req.body.Body; // The text body of the last incoming message
   console.log(`Last incoming message: ${lastMessageBody}`);
 
+  const resp = await main(lastMessageBody)
+
   // Your main function which presumably does some processing and returns a message
-  const mes = `Good news 😎 I found 3 relevant events for you this week: 
+  let mes = `Good news 😎 I found some relevant events for you this week: 
   
-  `+ await main(lastMessageBody);
-
-  
-  
-  twiml.message(mes.replace(/\\n/g, '\n'))
-
-  await setTimeout(() => {
-    twiml.message(`
-    👉 Please respond Y/N for attending the following events and why or why not:
+  `+ resp +
+  `👉 Please respond Y/N for attending the following events and why or why not:
       1. e.g. Y, because I love hackathons
       2. e.g. N, because I hate lectures
       3. e.g. N, because I'm busy on Thursdays 
-      `)
-  }, 100);
-
+      `;
+if (!resp.includes("No events")){
+  mes = "Sorry I couldn't find any relevant events for you this week! Try another event type."
+}
+  
+  twiml.message(mes.replace(/\\n/g, '\n'))
   res.type('text/xml').send(twiml.toString());
 });
-
 
 const { auth } = require('express-openid-connect');
 
