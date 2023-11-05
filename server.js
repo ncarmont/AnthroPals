@@ -224,6 +224,8 @@ What topics are you interested in? Give me one/two topics (e.g AI, dungeons and 
     res.send(`<!DOCTYPE html>
     <html>
     <head>
+    <link rel="icon" type="image/png" href="https://i.ibb.co/w44yFWy/DALL-E-2023-11-05-11-19-20-Design-a-logo-for-Anthro-Pals-an-innovative-AI-assisted-event-discovery-p.png" />
+
       <title>Registration Success</title>
       
       <style>
@@ -244,7 +246,7 @@ What topics are you interested in? Give me one/two topics (e.g AI, dungeons and 
         }
         
         h1 {
-          color: #dd4b39;
+          color: #179CC3;
         }
         footer {
           margin-top: 50px;
@@ -280,7 +282,7 @@ What topics are you interested in? Give me one/two topics (e.g AI, dungeons and 
         <p>
           Welcome aboard! Let us know if you have any other questions.
         </p>
-        <a href="./" style="background-color: #dd4b39; color: #fff; padding: 10px 15px; text-decoration: none;">Back to Home</a>
+        <a href="./" style="background-color:#F97E27; color: #fff; padding: 10px 15px; text-decoration: none;">Back to Home</a>
 
     
       </div>
@@ -319,7 +321,7 @@ app.get('/', (req, res) => {
     }
     
     label {
-      color: #dd4b39; 
+      color: #F97E27; 
       font-size: 1.2em;
       margin-bottom: 10px; 
     }
@@ -335,13 +337,13 @@ app.get('/', (req, res) => {
     }
     
     input:focus {
-      outline: 2px solid #dd4b39;
+      outline: 2px solid #F97E27;
     }
     
     button {
       padding: 12px 30px;
       font-size: 1em; 
-      background-color: #dd4b39;
+      background-color: #F97E27;
       color: white;
       border: grey 0.5px solid;
       border-radius: 4px;
@@ -380,7 +382,7 @@ app.get('/', (req, res) => {
       }
       
       .btn-google {
-        background-color: #dd4b39;
+        background-color: #F97E27;
         color: #fff;
         border: none;
       }
@@ -396,6 +398,7 @@ app.get('/', (req, res) => {
   
   <body>
       <div class="container">
+      <img style="margin: 0 auto; text-align: center; width: 100%; padding: 20px 100px; border-radius: 20px;" src="https://i.ibb.co/w44yFWy/DALL-E-2023-11-05-11-19-20-Design-a-logo-for-Anthro-Pals-an-innovative-AI-assisted-event-discovery-p.png" alt="AnthroPals Logo">
       
         <h1>AnthroPals</h1>
         
