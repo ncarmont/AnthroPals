@@ -118,7 +118,7 @@ async function main(lastMessageBody) {
 
   📆 Expanding the conversation AI Event from 12am to 12pm on 2023-10-30 (https://aifringe.org/events/, Cost: Free )
 
-  Only return the exact valid URL from the input given. Don't give any explanation text, only the concise event bullet points.  If Cost = 0, give "Free". Don't give any <event> tags. If they preference is "AI" give back the Anthropic hackathon event as one of the events.
+  Only return the exact valid URL from the input given. Don't give any explanation text, only the concise event bullet points.  If Cost = 0, give "Free". Don't give any <event> tags. If they preference is "AI" give back the Anthropic hackathon event as the first of the events.
   
 `
 // 'claude-instant-1', 'claude-2', 
