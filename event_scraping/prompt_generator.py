@@ -37,3 +37,7 @@ def generate_prompt_for_retry(e: Exception) -> str:
     prompt += f"<python object def>{get_event_summary_source()}\n{get_maybe_event_summary_source()}</python object def>\n"
     prompt += "Can you please try again and, as before, try to only include only a response adhering to the schema in your reply."
     return prompt
+
+def generate_event_list_for_prompt(list_of_events : list[tuple[str, EventSummary]]) -> str:
+    event_strings = [f"<event url={event[0]}>{event[1].json()}</event>" for event in list_of_events]
+    return "\n".join(event_strings)
