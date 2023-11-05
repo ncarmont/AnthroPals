@@ -122,7 +122,7 @@ async function main(lastMessageBody) {
 
   - Expanding the conversation AI Event from 12am to 12pm on 2023-10-30 (https://aifringe.org/events/)
 
-  Only return the exact valid URL from the input given. Don't give anything else but the event bullet points.
+  Only return the exact valid URL from the input given. Don't give any explanation text, only the concise event bullet points.
   
 `
 // 'claude-instant-1',
@@ -150,10 +150,12 @@ app.post('/sms', async (req, res) => {
   let mes = `Good news 😎 I found some relevant events for you this week: 
   
   `+ resp +
-  `👉 Please respond Y/N for attending the following events and why or why not:
+  `
+  
+  👉 Please respond Y/N for attending the following events and why or why not:
       1. e.g. Y, because I love hackathons
       2. e.g. N, because I hate lectures
-      3. e.g. N, because I'm busy on Thursdays 
+      3. 
       `;
 if (!resp.includes("http")){
   mes = "Sorry I couldn't find any relevant events for you this week! Try another event type."
