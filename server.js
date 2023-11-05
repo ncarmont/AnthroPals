@@ -45,7 +45,7 @@ app.post('/sms', async (req, res) => {
 
   // Your main function which presumably does some processing and returns a message
   const mes = await main(lastMessageBody);
-  twiml.message(JSON.stringify(mes))
+  twiml.message(mes.replace(/\\n/g, '\n'))
 
   res.type('text/xml').send(twiml.toString());
 });
