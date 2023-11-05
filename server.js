@@ -24,7 +24,9 @@ async function main(lastMessageBody) {
   Given these events ${JSON.stringify(events)} 
   
   I have the following user preference for events: ${lastMessageBody}.
-  What 3 events should I go to (including date and time) within the next week given today is ${new Date().toISOString()}?`
+  What 3 events should I go to (including date and time) within the next week given today is ${new Date().toISOString()}?
+  
+  If there are no relevant events in the designated timframe, please respond with "No events".`
   const completion = await anthropic.completions.create({
     model: 'claude-2',
     max_tokens_to_sample: 300,
@@ -82,7 +84,7 @@ app.get('/auth', (req, res) => {
 
 
 app.get('/test', async (req, res) => {
-  const mes = await main("AI Events")
+  const mes = await main("Sports Events")
   res.send(JSON.stringify(mes))
 });
 
@@ -147,7 +149,15 @@ What topics are you interested in? Give me one/two topics (e.g AI, energy, cooki
         h1 {
           color: #dd4b39;
         }
-        
+        footer {
+          margin-top: 50px;
+          text-align: center;
+      }
+      
+      footer a {
+          color: #aaa; 
+      }
+      
         p {
           font-size: 1.2em; 
         }
@@ -173,10 +183,18 @@ What topics are you interested in? Give me one/two topics (e.g AI, energy, cooki
         <p>
           Welcome aboard! Let us know if you have any other questions.
         </p>
+        <a href="./" style="background-color: #dd4b39; color: #fff; padding: 10px 15px; text-decoration: none;">Back to Home</a>
+
     
       </div>
     
     </body>
+    <footer>
+    <p>
+      <a href="/privacy">Privacy Policy</a> |  
+      <a href="/termsOfService">Terms of Service</a>
+    </p>
+  </footer>
     </html>`);
 })
 
@@ -457,7 +475,7 @@ app.listen(process.env.PORT || 3000, () => {
 const events = [
   {
     "eventName": "AI Conference", 
-    "eventDate": "2023-04-15",
+    "eventDate": "2023-11-05",
     "startTime": "5:00pm",
     "endTime": "9:00pm",
     "eventLocation": "Convention Center",
@@ -466,7 +484,7 @@ const events = [
   },
   {  
     "eventName": "Robotic Competition",
-    "eventDate": "2023-03-18",
+    "eventDate": "2023-11-05",
     "startTime": "6:00pm", 
     "endTime": "9:00pm",
     "eventLocation": "University Campus",
@@ -475,7 +493,7 @@ const events = [
   },
   {
     "eventName": "AI Hackathon",
-    "eventDate": "2023-05-05",
+    "eventDate": "2023-11-05",
     "startTime": "6:00pm",
     "endTime": "9:00pm", 
     "eventLocation": "Startup Incubator",
@@ -484,7 +502,7 @@ const events = [
   },
   {
     "eventName": "AI Ethics Seminar",
-    "eventDate": "2023-10-23",
+    "eventDate": "2023-11-05",
     "startTime": "7:00pm",
     "endTime": "9:00pm",
     "eventLocation": "University Auditorium",
@@ -493,7 +511,7 @@ const events = [
   },
   {
     "eventName": "Deep Learning Workshop",
-    "eventDate": "2023-07-28", 
+    "eventDate": "2023-11-05",
     "startTime": "5:00pm",
     "endTime": "8:00pm",
     "eventLocation": "Maker Space", 
@@ -502,11 +520,47 @@ const events = [
   },
   {
     "eventName": "AI Career Fair",
-    "eventDate": "2023-09-10",
+    "eventDate": "2023-11-05",
     "startTime": "4:00pm",
     "endTime": "8:00pm", 
     "eventLocation": "Convention Center",
     "eventDescription": "Technology career fair with major AI companies hiring.",
     "companies": ["OpenAI", "Anthropic", "Google Brain", "Meta AI"]
+  },
+  {
+    "eventName": "Cooking Class",
+    "eventDate": "2023-11-05",
+    "startTime": "6:30pm",
+    "endTime": "9:00pm",
+    "eventLocation": "Local Community Center",
+    "eventDescription": "Italian cooking class and dinner",
+    "instructor": "Chef Giada De Laurentiis"
+  },
+  {
+    "eventName": "Wine and Cheese Pairing",
+    "eventDate": "2023-11-05",
+    "startTime": "7:00pm",
+    "endTime": "9:00pm", 
+    "eventLocation": "Winery Tasting Room",
+    "eventDescription": "Learn to pair wines and cheeses",
+    "host": "Winery Sommelier"
+  },
+  {
+    "eventName": "Football Game",
+    "eventDate": "2023-11-05",
+    "startTime": "7:30pm",
+    "endTime": "10:30pm",
+    "eventLocation": "Local Stadium",
+    "eventDescription": "Season opening football game",
+    "teams": ["Sharks", "Cougars"]
+  },
+  {
+    "eventName": "Soccer Tournament", 
+    "eventDate": "2023-11-05",
+    "startTime": "8:00am",
+    "endTime": "6:00pm",
+    "eventLocation": "Soccer Complex",
+    "eventDescription": "Annual youth soccer tournament",
+    "teams": ["Strikers", "United", "FC Stars", "Lightning"]
   }
 ]
