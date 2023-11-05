@@ -15,7 +15,7 @@ const anthropic = new Anthropic({
 });
 
 async function main() {
-  const userQuestion = "What events are happening this week? "
+  const userQuestion = `Given these events ${JSON.stringify(events)} What events are happening this week?`
   const completion = await anthropic.completions.create({
     model: 'claude-2',
     max_tokens_to_sample: 300,
@@ -25,7 +25,6 @@ async function main() {
   return completion.completion
 }
   
-
 
 app.post('/sms', async (req, res) => {
   const twiml = new MessagingResponse();
@@ -442,3 +441,60 @@ app.get('/privacy', (req, res) => {
 app.listen(process.env.PORT || 3000, () => {
   console.log('Server listening on port');
 });
+
+const events = [
+  {
+    "eventName": "AI Conference", 
+    "eventDate": "2023-04-15",
+    "startTime": "5:00pm",
+    "endTime": "9:00pm",
+    "eventLocation": "Convention Center",
+    "eventDescription": "Annual conference on AI, machine learning and deep learning. Keynote speeches, workshops and exhibits from industry leaders.",
+    "speakerList": ["Andrew Ng", "Fei-Fei Li", "Yann LeCun"]
+  },
+  {  
+    "eventName": "Robotic Competition",
+    "eventDate": "2023-03-18",
+    "startTime": "6:00pm", 
+    "endTime": "9:00pm",
+    "eventLocation": "University Campus",
+    "eventDescription": "Robotics competition for high school students to build and program autonomous robots.",
+    "teams": ["Team Bolt", "Gearheads", "Tech Titans"]
+  },
+  {
+    "eventName": "AI Hackathon",
+    "eventDate": "2023-05-05",
+    "startTime": "6:00pm",
+    "endTime": "9:00pm", 
+    "eventLocation": "Startup Incubator",
+    "eventDescription": "24 hour hackathon for developers to build AI prototypes and compete for prizes.",
+    "sponsors": ["Google", "NVIDIA", "AWS"]
+  },
+  {
+    "eventName": "AI Ethics Seminar",
+    "eventDate": "2023-10-23",
+    "startTime": "7:00pm",
+    "endTime": "9:00pm",
+    "eventLocation": "University Auditorium",
+    "eventDescription": "Seminar discussing ethics of AI, algorithms, data privacy and surveillance.",
+    "speakers": ["Joanna Bryson", "Kate Crawford", "Timnit Gebru"]
+  },
+  {
+    "eventName": "Deep Learning Workshop",
+    "eventDate": "2023-07-28", 
+    "startTime": "5:00pm",
+    "endTime": "8:00pm",
+    "eventLocation": "Maker Space", 
+    "eventDescription": "2 day workshop on deep learning for computer vision and NLP. Hands-on training with TensorFlow.",
+    "instructor": "Andrew Trask"
+  },
+  {
+    "eventName": "AI Career Fair",
+    "eventDate": "2023-09-10",
+    "startTime": "4:00pm",
+    "endTime": "8:00pm", 
+    "eventLocation": "Convention Center",
+    "eventDescription": "Technology career fair with major AI companies hiring.",
+    "companies": ["OpenAI", "Anthropic", "Google Brain", "Meta AI"]
+  }
+]
