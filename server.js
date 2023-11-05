@@ -130,7 +130,6 @@ app.post('/sms', async (req, res) => {
   const twiml = new MessagingResponse();
   console.log(req.body);
   
-  // Get the last message sent to your Twilio number
   const lastMessageBody = req.body.Body; // The text body of the last incoming message
   console.log(`Last incoming message: ${lastMessageBody}`);
 
@@ -141,17 +140,6 @@ app.post('/sms', async (req, res) => {
   res.type('text/xml').send(twiml.toString());
 });
 
-// Passport config
-// passport.use(new GoogleStrategy({
-//   scope: ['profile', 'email', 'calendar'],
-//   clientID: process.env.GOOGLE_CLIENT_ID,
-//   clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-//   callbackURL: "/auth/google/callback"
-// }, (accessToken, refreshToken, profile, done) => {
-//   // handle authentication here
-//   // associate user with a session
-//   return done(null, profile);
-// }));
 const { auth } = require('express-openid-connect');
 
 const config = {
@@ -162,8 +150,6 @@ const config = {
   clientID: process.env.CLIENT_ID,
   issuerBaseURL: 'https://ncarmont.eu.auth0.com'
 };
-
-// auth router attaches /login, /logout, and /callback routes to the baseURL
 app.use(auth(config));
 
 // req.isAuthenticated is provided from the auth router
@@ -178,17 +164,6 @@ app.get('/test', async (req, res) => {
 });
 
 
-
-// app.get('/auth/google', 
-//   passport.authenticate('google', { scope: ['profile', 'email', 'calendar'] }));
-
-// app.get('/auth/google/callback', 
-//   passport.authenticate('google', { failureRedirect: '/login' }),
-//   (req, res) => {
-//     // Successful authentication, redirect home.
-//     res.redirect('/');
-//   });
-
 app.get('/message', (req, res) => {
   try {
     client.messages
@@ -202,12 +177,6 @@ What topics are you interested in? Give me one/two topics (e.g AI, energy, cooki
     })
     .then(message => console.log(message.sid)).done();
 
-
-
-
-
-    // from: 'whatsapp:+14155238886',
-    // to: 'whatsapp:+44'+req.query.phone
   } catch (error) {
     
   }
