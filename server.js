@@ -99,36 +99,41 @@ const anthropic = new Anthropic({
 });
 
 async function main(lastMessageBody) {
-  const userQuestion = `
-  Given these events ${JSON.stringify(eventsImpr)} 
+  try{
+    const userQuestion = `
+    Given these events ${JSON.stringify(eventsImpr)} 
+    
+    I have the following user preference for events: ${lastMessageBody}.
+    What 3 events should I go to (including date, time and the valid event link from the events I sent you) within the next week given today is ${new Date().toISOString()}?
+    
+    If there are no relevant events in the designated timeframe, please respond with "No events".
+    Be as concise as possible and give your response only in the following bullet points format: (e.g "📆 <event summary> from <start_time>-<end_time> on <date> (<url>, cost:<cost>)"). 
   
-  I have the following user preference for events: ${lastMessageBody}.
-  What 3 events should I go to (including date, time and the valid event link from the events I sent you) within the next week given today is ${new Date().toISOString()}?
+    
   
-  If there are no relevant events in the designated timeframe, please respond with "No events".
-  Be as concise as possible and give your response only in the following bullet points format: (e.g "📆 <event summary> from <start_time>-<end_time> on <date> (<url>, cost:<cost>)"). 
-
+    For example for this event:
   
-
-  For example for this event:
-
-  <event url=https://aifringe.org/events/>{"title": "Expanding the conversation: AI for everyone", "event_description": "Day one at the AI Fringe Hub will set the scene for the week\u2019s conversations, exploring the benefits and risks of AI, its impact on underrepresented communities, research across the devolved nations, and more.", "demographics": "Anyone interested in AI", "keywords": ["AI", "ethics", "safety", "policy"], "time_start": "2023-10-30T00:00:00", "time_end": "2023-10-30T23:59:59", "location": "Knowledge Centre at The British Library", "cost_in_pounds": 0, "activity_types": ["learning", "discussion"], "interactive": true, "food_and_drink": false, "estimated_number_of_attendees": 100}</event>
-
-  We want the following response: 
-
-  📆 Expanding the conversation AI Event from 12am to 12pm on 2023-10-30 (https://aifringe.org/events/, Cost: Free )
-
-  Only return the exact valid URL from the input given. Don't give any explanation text, only the concise event bullet points.  If Cost = 0, give "Free". Don't give any <event> tags. If they preference is "AI" give back the Anthropic hackathon event as the first of the events.
+    <event url=https://aifringe.org/events/>{"title": "Expanding the conversation: AI for everyone", "event_description": "Day one at the AI Fringe Hub will set the scene for the week\u2019s conversations, exploring the benefits and risks of AI, its impact on underrepresented communities, research across the devolved nations, and more.", "demographics": "Anyone interested in AI", "keywords": ["AI", "ethics", "safety", "policy"], "time_start": "2023-10-30T00:00:00", "time_end": "2023-10-30T23:59:59", "location": "Knowledge Centre at The British Library", "cost_in_pounds": 0, "activity_types": ["learning", "discussion"], "interactive": true, "food_and_drink": false, "estimated_number_of_attendees": 100}</event>
   
-`
-// 'claude-instant-1', 'claude-2', 
-  const completion = await anthropic.completions.create({
-    model: 'claude-instant-1', 
-    max_tokens_to_sample: 300,
-    prompt: `\n\nHuman: ${userQuestion}\n\nAssistant:`,
-  });
-  console.log(completion.completion);
-  return completion.completion
+    We want the following response: 
+  
+    📆 Expanding the conversation AI Event from 12am to 12pm on 2023-10-30 (https://aifringe.org/events/, Cost: Free )
+  
+    Only return the exact valid URL from the input given. Don't give any explanation text, only the concise event bullet points.  If Cost = 0, give "Free". Don't give any <event> tags. If they preference is "AI" give back the Anthropic hackathon event as the first of the events.
+    
+  `
+  // 'claude-instant-1', 'claude-2', 
+    const completion = await anthropic.completions.create({
+      model: 'claude-instant-1', 
+      max_tokens_to_sample: 300,
+      prompt: `\n\nHuman: ${userQuestion}\n\nAssistant:`,
+    });
+    console.log(completion.completion);
+    return completion.completion
+  } catch(e){
+    throw new Error(e)
+  }
+  
 }
   
 
@@ -154,23 +159,22 @@ app.post('/sms', async (req, res) => {
  
 });
 
-const { auth } = require('express-openid-connect');
+// const { auth } = require('express-openid-connect');
 
-const config = {
-  authRequired: false,
-  auth0Logout: true,
-  secret: 'a long, randomly-generated string stored in env',
-  baseURL: 'https://www.anthropals.social',
-  clientID: process.env.CLIENT_ID,
-  issuerBaseURL: 'https://ncarmont.eu.auth0.com'
-};
-app.use(auth(config));
+// const config = {
+//   authRequired: false,
+//   auth0Logout: true,
+//   secret: 'a long, randomly-generated string stored in env',
+//   baseURL: 'https://www.anthropals.social',
+//   clientID: process.env.CLIENT_ID,
+//   issuerBaseURL: 'https://ncarmont.eu.auth0.com'
+// };
+// app.use(auth(config));
 
-// req.isAuthenticated is provided from the auth router
-app.get('/auth', (req, res) => {
-  res.send(req.oidc.isAuthenticated() ? 'Logged in' : 'Logged out');
-});
-
+// // req.isAuthenticated is provided from the auth router
+// app.get('/auth', (req, res) => {
+//   res.send(req.oidc.isAuthenticated() ? 'Logged in' : 'Logged out');
+// });
 
 app.get('/test', async (req, res) => {
   const mes = await main("AI")
