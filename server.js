@@ -194,7 +194,7 @@ app.get('/message', (req, res) => {
         body: 
 `Hi there from AnthroPals! 👋 I\'m here to keep your social calendar up and buzzing.
 
-What topics are you interested in? Give me one/two topics (e.g AI, energy, cooking, sports).`,
+What topics are you interested in? Give me one/two topics (e.g AI, dungeons and dragons, etc).`,
         to: '+44'+req.query.phone.replace(/^0/, ''),
         from: '+447862144615'
     })
