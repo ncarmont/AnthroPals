@@ -1,0 +1,26 @@
+{
+    "name": "AnthroPals",
+    "version": "1.0.0",
+    "description": "AnthroPals",
+    "manifest_version": 3,
+    "author": "AnthroPals",
+    "action":{
+        "default_title": "AnthroPals"
+    },
+    "host_permissions": [
+      "<all_urls>", 
+      "http://*/"
+    ],
+    "permissions": ["tabs", "storage"],
+    "content_scripts": [
+        {
+         "matches": ["<all_urls>"],
+          "js": [
+            "script.js"
+          ]
+        }
+      ],    "host_permissions": [
+        "<all_urls>"
+      ]
+
+}

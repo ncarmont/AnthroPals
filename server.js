@@ -1,8 +1,7 @@
 const express = require('express');
-// const passport = require('passport');
-// const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const dotenv = require('dotenv');
 dotenv.config();
+const eventsJson = require('./all_events.json');
 const bodyParser = require('body-parser');
 const app = express();
 const accountSid = 'AC27655ac42ecf740b31e84da34a6c442d';
@@ -17,7 +16,8 @@ const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const session = require('express-session');
 const { google } = require('googleapis');
 
-// Replace with your own values
+
+
 const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
 const GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET;
 
@@ -37,9 +37,6 @@ passport.use(new GoogleStrategy({
     callbackURL: "https://www.anthropals.social/auth/google/callback"
   },
   (accessToken, refreshToken, profile, done) => {
-    // User's Google profile is returned to represent the logged-in user
-    // You could associate the Google account with a user record in your database here
-    // For this example, the profile is passed along in the callback
     return done(null, profile);
   }
 ));
@@ -110,14 +107,14 @@ const anthropic = new Anthropic({
 async function main(lastMessageBody) {
   const userQuestion = `
   Be as concise as possible and give your response in bullet points (e.g "- AI Event from 2-3pm on 10/10/2023")
-  Given these events ${JSON.stringify(events)} 
+  Given these events ${JSON.stringify(eventsJson.events)} 
   
   I have the following user preference for events: ${lastMessageBody}.
   What 3 events should I go to (including date and time) within the next week given today is ${new Date().toISOString()}?
   
   If there are no relevant events in the designated timframe, please respond with "No events".`
   const completion = await anthropic.completions.create({
-    model: 'claude-2',
+    model: 'claude-instant-1',
     max_tokens_to_sample: 300,
     prompt: `\n\nHuman: ${userQuestion}\n\nAssistant:`,
   });
@@ -159,7 +156,7 @@ app.get('/auth', (req, res) => {
 
 
 app.get('/test', async (req, res) => {
-  const mes = await main("Sports Events")
+  const mes = await main("Dungeons and Dragons")
   res.send(JSON.stringify(mes))
 });
 
