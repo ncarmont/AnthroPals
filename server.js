@@ -106,11 +106,11 @@ const anthropic = new Anthropic({
 
 async function main(lastMessageBody) {
   const userQuestion = `
-  Be as concise as possible and give your response in bullet points (e.g "- AI Event from 2-3pm on 10/10/2023")
+  Be as concise as possible and give your response in bullet points (e.g "- AI Event from 2-3pm on 10/10/2023 (https://event.com/event")
   Given these events ${JSON.stringify(eventsImpr)} 
   
   I have the following user preference for events: ${lastMessageBody}.
-  What 3 events should I go to (including date and time) within the next week given today is ${new Date().toISOString()}?
+  What 3 events should I go to (including date, time and the valid event link from the events I sent you) within the next week given today is ${new Date().toISOString()}?
   
   If there are no relevant events in the designated timeframe, please respond with "No events".`
   const completion = await anthropic.completions.create({
