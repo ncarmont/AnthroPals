@@ -27,7 +27,7 @@ def generate_main_prompt_body(url: str) -> str:
     prompt += "Please summarise the website content using the following JSON schema:\n"
     prompt += f"<JSON schema>{MaybeEventSummary.schema()}</JSON schema>\n"
     prompt += "In your reply, include only a response adhering to the schema.\n"
-    prompt += "Note that `event_summary` must be `None` iff `is_event_and_is_in_future` is `False`."
+    prompt += "Note that `event_summary` must be `None` iff `is_single_event_and_is_in_future` is `False`."
     return prompt
 
 def generate_prompt_for_retry(e: Exception) -> str:
@@ -39,5 +39,5 @@ def generate_prompt_for_retry(e: Exception) -> str:
     return prompt
 
 def generate_event_list_for_prompt(list_of_events : list[tuple[str, EventSummary]]) -> str:
-    event_strings = [f"<event url={event[0]}>{event[1].json()}</event>" for event in list_of_events]
+    event_strings = [f"<event url={event[0]} id={idx}>{event[1].json()}</event>" for idx, event in enumerate(list_of_events)]
     return "\n".join(event_strings)

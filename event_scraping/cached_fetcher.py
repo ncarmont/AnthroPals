@@ -1,10 +1,12 @@
 import os
 import pickle
 import datetime as dt
+import time
 
 from anthropic_interface import AnthropicInterface, MaybeEventSummary
 
 from event_template import EventSummary
+import csv
 
 CACHE_FILE = "cached_events.pkl"
 URLS_FILE = "cached_urls.pkl"
@@ -27,14 +29,25 @@ def load_cached_urls() -> set[str]:
     else:
         return set()
 
-def save_cached_urls(cached_urls: set[str]):
+def save_cached_urls(cached_urls: set[str]) -> None:
     with open(URLS_FILE, "wb") as f:
         pickle.dump(cached_urls, f, protocol=pickle.HIGHEST_PROTOCOL)
 
-def add_to_cached_urls(urls_to_add: set[str]):
+def add_to_cached_urls(urls_to_add: set[str]) -> None:
     current_urls = load_cached_urls()
     current_urls = current_urls.union(urls_to_add)
     save_cached_urls(current_urls)
+
+def add_to_cached_urls_from_csv(csv_path: str) -> None:
+    urls_to_add = set()
+    with open(csv_path, newline='') as csvfile:
+        reader = csv.DictReader(csvfile)
+        for row in reader:
+            if 'is_event' in row:
+                if row['is_event'] != 'events_page':
+                    continue
+            urls_to_add.add(row['event_url'])
+    add_to_cached_urls(urls_to_add)
 
 def fetch_event_summary(url: str) -> MaybeEventSummary:
     cached_events = load_cached_events()
@@ -45,6 +58,7 @@ def fetch_event_summary(url: str) -> MaybeEventSummary:
         event_summary = AnthropicInterface().try_create_event_summary(url)
         cached_events[url] = event_summary
         save_cached_events(cached_events)
+        time.sleep(1)
         return event_summary
     
 def get_all_future_events(current_datetime: dt.datetime) -> list[tuple[str, EventSummary]]:

@@ -30,10 +30,10 @@ class EventSummary(BaseModel):
         return v
     
 class MaybeEventSummary(BaseModel):
-    is_event_page_and_is_in_future: bool
+    is_single_event_page_and_is_in_future: bool
     event_summary: EventSummary | None = None
     @validator('event_summary', always=True)
     def validate_event_summary(cls, v, values):
-        if not values.get('is_event_and_is_in_future', True) and v is not None:
-            raise ValueError('event_summary must be `None` iff `is_event_and_is_in_future` is `False`')
+        if not values.get('is_single_event_and_is_in_future', True) and v is not None:
+            raise ValueError('event_summary must be `None` iff `is_single_event_and_is_in_future` is `False`')
         return v
