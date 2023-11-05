@@ -140,27 +140,11 @@ async function main(lastMessageBody) {
 app.post('/sms', async (req, res) => {
 
   const twiml = new MessagingResponse();
-  console.log(req.body);
-
   const lastMessageBody = req.body.Body; // The text body of the last incoming message
-
-  // if (lastMessageBody.includes("1.")){
-  //     await fs.writeFile('./localdb.json', {lastMessageBody}, (err) => {
-  //       if (err) throw err;
-  // //       console.log('Data written to file');
-  // //   });
-
-  //   const out = JSON.stringify(JSON.parse(fs.readFileSync("./localdb.json").toString()))
-
-    // res.type('text/xml').send(out.toString());
-
-  // }
-
   console.log(`Last incoming message: ${lastMessageBody}`);
 
   const resp = await main(lastMessageBody)
 
-  // Your main function which presumably does some processing and returns a message
   let mes = `Good news 😎 I found some relevant events for you this week: 
   
   `+ resp 
@@ -178,7 +162,7 @@ if (!resp.includes("http")){
 }
   
   twiml.message(mes.replace(/\\n/g, '\n'))
-  res.type('text/xml').send(twiml.toString());
+  return res.type('text/xml').send(twiml.toString());
 });
 
 const { auth } = require('express-openid-connect');
