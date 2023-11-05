@@ -114,8 +114,9 @@ async function main(lastMessageBody) {
   If there are no relevant events in the designated timeframe, please respond with "No events".
   Be as concise as possible and give your response only in the following bullet points format: (e.g "- AI Event from 2-3pm on 10/10/2023 (https://event.com/event")  
 `
+// 'claude-instant-1',
   const completion = await anthropic.completions.create({
-    model: 'claude-instant-1',
+    model: 'claude-2', 
     max_tokens_to_sample: 300,
     prompt: `\n\nHuman: ${userQuestion}\n\nAssistant:`,
   });
