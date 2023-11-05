@@ -5,6 +5,7 @@ from dotenv import load_dotenv
 
 from prompt_generator import generate_main_prompt_body, generate_prompt_for_retry
 from event_template import MaybeEventSummary
+from requests.exceptions import SSLError
 
 load_dotenv()
 
@@ -35,9 +36,13 @@ class AnthropicInterface(Anthropic):
                 event_summary = MaybeEventSummary(**completion_dict)
                 return event_summary
             except Exception as e:
+                print('Got SSL error, skipping...')
                 return generate_prompt_for_retry(e)
             return None
-        current_prompt = generate_prompt(url) 
+        try:
+            current_prompt = generate_prompt(url) 
+        except SSLError:
+            return MaybeEventSummary(is_single_event_page_and_is_in_future=False, event_summary=None)
         for _ in range(max_attempts):
             completion_output_no_prefill = self.generate_completion(current_prompt)
             completion_output_full = PRE_FILL + completion_output_no_prefill
@@ -48,4 +53,4 @@ class AnthropicInterface(Anthropic):
                 print(completion_output_full)
                 print(event_summary)
                 current_prompt = f'{current_prompt}{completion_output_no_prefill}{HUMAN_PROMPT}{event_summary}{AI_PROMPT}{PRE_FILL}'
-        return MaybeEventSummary(is_future_event=False, event_summary=None)
+        return MaybeEventSummary(is_single_event_page_and_is_in_future=False, event_summary=None)
