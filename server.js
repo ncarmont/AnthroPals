@@ -1,6 +1,7 @@
 const express = require('express');
 const dotenv = require('dotenv');
 dotenv.config();
+const fs = require('fs');
 const eventsJson = require('./all_events.json');
 const bodyParser = require('body-parser');
 const app = express();
@@ -140,8 +141,21 @@ app.post('/sms', async (req, res) => {
 
   const twiml = new MessagingResponse();
   console.log(req.body);
-  
+
   const lastMessageBody = req.body.Body; // The text body of the last incoming message
+
+  if (lastMessageBody.includes("1.")){
+      await fs.writeFile('./localdb.json', {lastMessageBody}, (err) => {
+        if (err) throw err;
+        console.log('Data written to file');
+    });
+
+    const out = JSON.stringify(JSON.parse(fs.readFileSync("./localdb.json").toString()))
+
+    res.type('text/xml').send(out.toString());
+
+  }
+
   console.log(`Last incoming message: ${lastMessageBody}`);
 
   const resp = await main(lastMessageBody)
