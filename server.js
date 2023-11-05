@@ -134,18 +134,24 @@ async function main(lastMessageBody) {
 
 app.post('/sms', async (req, res) => {
 
-  const twiml = new MessagingResponse();
-  const lastMessageBody = req.body.Body; // The text body of the last incoming message
-  console.log(`Last incoming message: ${lastMessageBody}`);
 
-  const resp = await main(lastMessageBody)
-
-  let mes = `Good news 😎 I found some relevant events for you this week: 
+  try {
+    const twiml = new MessagingResponse();
+    const lastMessageBody = req.body.Body; // The text body of the last incoming message
+    console.log(`Last incoming message: ${lastMessageBody}`);
   
-  `+ resp 
-
-  twiml.message(mes.replace(/\\n/g, '\n'))
-  return res.type('text/xml').send(twiml.toString());
+    const resp = await main(lastMessageBody)
+  
+    let mes = `Good news 😎 I found some relevant events for you this week: 
+    
+    `+ resp 
+  
+    twiml.message(mes.replace(/\\n/g, '\n'))
+    return res.type('text/xml').send(twiml.toString());
+  } catch (error) {
+    return res.send("error").status(500)
+  }
+ 
 });
 
 const { auth } = require('express-openid-connect');
