@@ -1,3 +1,4 @@
+
 import pandas as pd
 from anthropic import Anthropic, HUMAN_PROMPT, AI_PROMPT
 
@@ -40,7 +41,7 @@ def main():
     subject = "AI"
     objective = "making friends"
     winder_intrest ="music"
-    path = r'...\events.csv'
+    path = r'C:\Users\Lina.Drozd\OneDrive - Baringa Partners LLP\Documents\events.csv'
     df = pd.read_csv(path)
 
     ai_recommendations = get_recommendations(df=df, subject=subject, objective=objective,winder_intrest=winder_intrest)
