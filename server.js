@@ -152,7 +152,7 @@ app.post('/sms', async (req, res) => {
     twiml.message(mes.replace(/\\n/g, '\n'))
     return res.type('text/xml').send(twiml.toString());
   } catch (error) {
-    return res.send("error").status(500)
+    return res.send(e)
   }
 });
 
@@ -193,7 +193,7 @@ What topics are you interested in? Give me one/two topics (e.g AI, Spanish, etc)
     .then(message => console.log(message.sid)).done();
 
   } catch (error) {
-    return new Error(error).status(500)
+    return new Error(error)
   }
     res.send(`<!DOCTYPE html>
     <html>
