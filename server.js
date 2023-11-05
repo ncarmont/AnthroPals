@@ -34,10 +34,8 @@ app.post('/sms', async (req, res) => {
   const twiml = new MessagingResponse();
   console.log(req)
 
-  const mes = await main()
+  // const mes = await main()
   twiml.message(JSON.stringify(req))
-
-  // twiml.message('Great! We will send you a few event options right away!');
 
   res.type('text/xml').send(twiml.toString());
 });
