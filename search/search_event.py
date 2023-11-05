@@ -7,6 +7,9 @@ from requests.structures import CaseInsensitiveDict
 from anthropic import Anthropic, HUMAN_PROMPT, AI_PROMPT
 from serpapi import GoogleSearch
 
+import search_utils
+import scrape_utils
+
 
 ANTHROPIC_API_KEY \
     = "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"
@@ -103,29 +106,44 @@ def execute_web_search(search_query, provider):
         return _parse_serp_response(results)
 
 
-def locate_event_link_on_website():
-    """Given a website tree, locate the event link if it exists"""
-    pass
+def classify_event_page_and_parse(url, retry=0):
+    """Determine if the link is an events page"""
 
+    ai_prompt = """
+            You are an assistant that is looking for events to attend. 
+            I will give you a URL, based on the url-only and not actual page.
+            
+            Output a classification (events-page, events-directory, not-related).
+            - events_page: the page describes a single event
+            - events_directory: the page lists and describes multiple events 
+            - unrelated: the page is not related to an events
 
-def has_events_page():
-    """Given a website, review links to find /events links"""
-    pass
+            Output your answer as a json format only
+            For example
+            {'url' , 'classification': (events_page, events_directory or unrelated)}
+            """
 
+    prompt = ai_prompt + f"Here is the url {url}, output your classification."
 
-def run_events_locator():
+    if retry < 3:
+        try:
+            anthropic = Anthropic(api_key=ANTHROPIC_API_KEY)
+            completion = anthropic.completions.create(
+                model="claude-2",
+                max_tokens_to_sample=300,
+                prompt=f"{HUMAN_PROMPT}{prompt}{AI_PROMPT}",
+            )
+            completion = completion.completion
+            completion = _parse_claude_response(completion)
+            return {'url': url,
+                    'is_events': completion['classification']}
 
-    # generate google searches
+        except Exception as e:
+            print(f"Claude failed event_page_classification (attempt: {retry})")
+            print(f"{e}")
+            return classify_event_page_and_parse(url=url, retry=retry + 1)
 
-    # execute google searches
-
-    # aggregate search result links
-
-    # visit each page & locate event page (if it exists)
-
-    # send events page to team
-
-    pass
+    raise ValueError("Claude cannot classify events page")
 
 
 def run_single_topic_flow(search_topic):
@@ -144,10 +162,16 @@ def run_single_topic_flow(search_topic):
             search_query_links = execute_web_search(search_query=search_query, provider="brave")
 
             for brave_response in search_query_links:
+                url = brave_response['url']
+                c_response = classify_event_page_and_parse(url, retry=0)
+
                 event_record = {'topic': search_topic,
                                 'search_title': brave_response['title'],
-                                'event_url': brave_response['url']}
+                                'event_url': url,
+                                'is_event': c_response['is_events']
+                                }
 
+                print(f"event_url: {url} | is_event: {event_record['is_event']}")
                 events_by_topic.append(event_record)
 
         except Exception as e:
@@ -156,7 +180,7 @@ def run_single_topic_flow(search_topic):
 
     # store results
     df_events = pd.DataFrame(events_by_topic)
-    events_csv_path = f"~/Desktop/{search_topic}_events.csv"
+    events_csv_path = f"~/Desktop/{search_topic}_events_w_filter.csv"
     df_events.to_csv(events_csv_path)
     print(f"Stored {search_topic} links to {events_csv_path}")
 
@@ -166,7 +190,7 @@ def run_single_topic_flow(search_topic):
 def run_tool():
 
     # Specify search topic
-    search_topics = ["dungeon and dragons", "auto show", "ai hackathon", "science lecture"]
+    search_topics = ["dungeon and dragons", "cooking & culinary"]
 
     # Generate search queries for topic
     all_events = []
