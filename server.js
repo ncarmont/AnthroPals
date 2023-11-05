@@ -15,24 +15,26 @@ const anthropic = new Anthropic({
 });
 
 async function main() {
+  const userQuestion = "What events are happening this week? "
   const completion = await anthropic.completions.create({
     model: 'claude-2',
     max_tokens_to_sample: 300,
-    prompt: `What ?`,
+    prompt: `\n\nHuman: ${userQuestion}\n\nAssistant:`,
   });
   console.log(completion.completion);
+  return completion.completion
 }
-main().catch(console.error);
   
 
 
 app.post('/sms', async (req, res) => {
   const twiml = new MessagingResponse();
+  console.log(req)
 
-  // const mes = await main()
-  // twiml.message(JSON.stringify(mes))
+  const mes = await main()
+  twiml.message(JSON.stringify(mes))
 
-  twiml.message('Great! We will send you a few event options right away!');
+  // twiml.message('Great! We will send you a few event options right away!');
 
   res.type('text/xml').send(twiml.toString());
 });
