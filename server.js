@@ -15,7 +15,11 @@ const anthropic = new Anthropic({
 });
 
 async function main() {
-  const userQuestion = `Given these events ${JSON.stringify(events)} What events are happening this week?`
+  const userQuestion = `
+  Be as concise as possible and give your response in bullet points (e.g "- AI Event from 2-3pm on 10/10/2023")
+  Given these events ${JSON.stringify(events)} 
+  
+  What 3 events should I go to (including date and time) within the next week given today is ${new Date().toISOString()}?`
   const completion = await anthropic.completions.create({
     model: 'claude-2',
     max_tokens_to_sample: 300,
@@ -31,7 +35,7 @@ app.post('/sms', async (req, res) => {
   console.log(req)
 
   const mes = await main()
-  twiml.message(JSON.stringify(mes))
+  twiml.message(JSON.stringify(req))
 
   // twiml.message('Great! We will send you a few event options right away!');
 
