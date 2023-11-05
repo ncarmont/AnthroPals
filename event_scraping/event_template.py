@@ -7,6 +7,7 @@ class EventSummary(BaseModel):
     title: str
     event_description: str = Field(description="A one sentence description of the event")
     demographics: str = Field(description="Who this event might be for")
+    keywords: list[str] = Field(description="A list of up to 5 keywords")
     time_start: dt.datetime
     time_end: dt.datetime
     location: str
